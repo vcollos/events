@@ -1,0 +1,1019 @@
+<!doctype html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Grade de Cursos - Congresso Campinas 2025</title>
+    <!-- Material Design CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <style>
+        @import "@material/card/mdc-card";
+        body {
+            font-family: "Roboto", sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+        }
+        /* Material Design 3 Card Tooltip styling */
+        
+        .tooltip {
+            position: fixed;
+            /* Changed from absolute to fixed for better positioning */
+            background-color: #ffffff;
+            color: #1c1b1f;
+            border-radius: 16px;
+            /* Increased border radius for MD3 style */
+            z-index: 1000;
+            /* Increased z-index to ensure it's above other elements */
+            width: 340px;
+            /* Slightly wider for better content display */
+            text-align: left;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15), 0px 1px 3px rgba(0, 0, 0, 0.30);
+            /* Enhanced shadow for MD3 */
+            pointer-events: auto;
+            /* Allow interactions with links */
+            opacity: 0;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            /* Faster transition for better UX */
+            transform: translateY(10px);
+            overflow: hidden;
+            font-size: 14px;
+            line-height: 1.5;
+            max-height: 80vh;
+            /* Limit height to prevent overflow */
+            overflow-y: auto;
+            /* Allow scrolling if content is too long */
+        }
+        /* Style for links in tooltip */
+        
+        .tooltip a {
+            color: #1976d2;
+            text-decoration: none;
+            pointer-events: auto;
+            /* Ensure links are clickable */
+        }
+        
+        .tooltip a:hover {
+            text-decoration: underline;
+        }
+        
+        .tooltip.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .tooltip-header {
+            width: 100%;
+            height: 160px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .tooltip-header img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .tooltip-content {
+            padding: 16px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        
+        .tooltip-title {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #1c1b1f;
+        }
+        
+        .tooltip-subtitle {
+            font-size: 14px;
+            font-weight: 400;
+            margin-bottom: 16px;
+            color: #49454f;
+        }
+        
+        .tooltip-body {
+            font-size: 14px;
+            color: #49454f;
+            margin-bottom: 8px;
+        }
+        
+        .tooltip-cv {
+            font-size: 12px;
+            color: #49454f;
+            margin-top: 12px;
+            padding-top: 8px;
+            border-top: 1px solid #e0e0e0;
+            /* Add separator line for CV section */
+        }
+        
+        .tooltip-cv ul {
+            margin: 8px 0 0 0;
+            padding-left: 16px;
+        }
+        
+        .tooltip-cv li {
+            margin-bottom: 6px;
+            line-height: 1.4;
+        }
+        
+        table {
+            width: 100%;
+            table-layout: fixed; /* Importante para que as larguras das colunas sejam consistentes */
+            /* Remove display block e overflow-x para desktop */
+            display: table;
+            overflow-x: visible;
+            margin: auto;
+            border-collapse: collapse;
+            border-spacing: 0;
+            margin-top: 20px;
+            background: #fafafa;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        @media (max-width: 768px) {
+        /* Configuração do header e filtros */
+        .header-container {
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 5%;
+        }
+        .day-filter {
+            order: 2;
+            margin-left: 0;
+            margin-top: 10px;
+        }
+        .legend {
+            order: 1;
+            flex-direction: column;
+            margin-right: 10px;
+        }
+        
+        /* Ajustes da tabela para visualização móvel */
+        table {
+            display: block;
+            overflow-x: auto;
+            white-space: nowrap;
+            width: 100%;
+            min-width: 100%;
+            -webkit-overflow-scrolling: touch;
+            table-layout: auto;
+            border-collapse: collapse;
+            position: relative;
+            margin-left: 0;
+            margin-right: 0;
+        }
+        
+        /* Garantir que o corpo da tabela permita rolagem */
+        table tbody {
+            display: table;
+            min-width: calc(250px * 11); /* 11 colunas com largura mínima */
+            width: max-content; /* Permitir que a tabela cresça conforme necessário */
+        }
+        
+        /* Força a rolagem horizontal logo no início */
+        #schedule {
+            scrollbar-width: thin; /* Para Firefox */
+            -ms-overflow-style: -ms-autohiding-scrollbar; /* Para IE/Edge */
+        }
+        
+        #schedule::-webkit-scrollbar {
+            height: 8px; /* Para Chrome/Safari/Opera */
+        }
+        
+        #schedule::-webkit-scrollbar-thumb {
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+        }
+        
+        /* Tamanho específico das linhas no smartphone */
+        table tr,
+        thead tr {
+            height: 75px !important;
+            min-height: 75px !important;
+            display: table-row;
+        }
+        table tr:first-child,
+        thead tr:first-child {
+            height: 75px !important;
+            min-height: 75px !important;
+            min-width: 250px;
+            width: 100%;
+        }
+        
+        /* Configuração das células da tabela */
+        th, td {
+            min-width: 250px;
+            max-width: 265px;
+            display: table-cell;
+            vertical-align: top;
+            height: inherit;
+            position: static !important;
+            box-sizing: border-box;
+        }
+        
+        /* Ajuste específico para a primeira linha do cabeçalho (nomes das salas) */
+        thead th {
+            min-width: 265px;
+            width: 265;
+            max-width: 265px;
+            font-size: 14px;
+            padding: 10px 5px;
+            white-space: normal; /* Permite quebra de linha se necessário */
+            vertical-align: middle;
+            height: 75px !important;
+            line-height: 1.2;
+        }
+        th:first-child {
+            min-width: 86px;
+            width: 265px;
+        }
+        /* Primeira coluna (horários) */
+        td:first-child {
+            position: static !important;
+            box-shadow: none !important;
+            min-width: 80px;
+            width: 80px;
+            max-width: 80px;
+            font-weight: bold;
+        }
+        
+        /* Reduz tamanho da fonte para melhor visualização */
+        th {
+            font-size: 13px;
+        }
+        
+        /* Ajustes nos cards */
+        .mdc-card {
+            position: relative !important;
+            height: 100% !important;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+            border-left: none !important;
+            border-top: 5px solid transparent;
+            margin: 0;
+            padding: 7px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+            transition: box-shadow 0.3s ease-in-out;
+            background-color: #FFFFFF;
+        }
+        
+        /* Ajustes no conteúdo dos eventos */
+        .event-content {
+            padding: 5px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .event-content .title {
+            font-size: 12px;
+        }
+        
+        /* Ajustes para células com rowspan */
+        td[rowspan] {
+            height: calc(75px * var(--rowspan, 1)) !important;
+        }
+        
+        /* Configuração do tooltip */
+        .tooltip {
+            max-width: 90vw;
+            width: 280px;
+            max-height: 70vh;
+        }
+        
+        /* Ajuste para evitar sobreposição de cards na visualização móvel */
+        td {
+            padding: 0 !important;
+            border: 1px solid #e0e0e0;
+        }
+        
+        /* Garantir que o cabeçalho da tabela tenha o mesmo layout que o corpo */
+        table thead {
+            display: table-header-group;
+        }
+        
+        table thead tr {
+            display: table-row;
+        }
+        
+        /* Indicador de rolagem */
+        .scroll-indicator {
+            padding: 10px 0;
+            text-align: center;
+            color: #26a69a;
+            font-size: 14px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        }
+        
+        th,
+        td {
+            vertical-align: middle;
+            text-align: center;
+            position: relative;
+            padding: 0;
+        }
+        
+        th {
+            background-color: #6d6d6d;
+            color: white;
+        }
+        
+        th,
+        td {
+            width: 11%;
+        }
+        
+        th:first-child,
+        td:first-child {
+            width: 8%;
+            position: sticky;
+            /* Make the first column sticky */
+            left: 0;
+            z-index: 1;
+            /* Ensure the sticky column is above other content */
+            background-color: #ffffff;
+            /* Set white background */
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            /* Add shadow to the right */
+            vertical-align: middle;
+            text-align: center;
+        }
+        
+        .event-content {
+            padding: 7px;
+        }
+        
+        table tr {
+            height: 55px; /* metade do anterior para 15 minutos */
+            vertical-align: middle;
+        }
+        
+        td {
+            vertical-align: top;
+        }
+        
+        .mdc-card {
+            max-height: 100%; /* Limita para não extrapolar a célula */
+            overflow: hidden; /* Esconde excesso */
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+            border-left: none !important;
+            border-top: 5px solid transparent;
+            margin: 0;
+            padding: 7px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+            transition: box-shadow 0.3s ease-in-out;
+            background-color: #FFFFFF;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+
+        
+        .mdc-card.cat-c {
+            border-top-color: #bf9cff !important;
+        }
+        
+        .mdc-card.cat-e {
+            border-top-color: #e1ff7b !important;
+        }
+        
+        .mdc-card.cat-h {
+            border-top-color: #810e56 !important;
+        }
+        
+        .mdc-card.cat-m {
+            border-top-color: #ff637e !important;
+        }
+        .mdc-card.cat-s {
+            border-top-color: #22523D !important;
+        }
+        
+        .mdc-card:hover {
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+        }
+        /* No longer needed as we'll handle this with JavaScript */
+        
+        .event-content {
+            color: #232F34;
+            font-size: 13px;
+            font-weight: normal;
+            line-height: 1.2;
+            white-space: pre-line;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            height: 100%;
+            padding: 10px;
+            overflow: hidden; /* Evita overflow */
+        }
+        
+        .event-content strong {
+            font-size: 1em;
+        }
+        
+        .event-content strong.title {
+            font-size: 13px;
+            font-weight: bold;
+            line-height: 1.2;
+            margin-bottom: 2px;
+            white-space: pre-line;
+        }
+        
+        .event-content .time-room {
+            font-size: 12px;
+            font-weight: normal;
+            line-height: 1.2;
+            margin-bottom: 8px;
+            white-space: pre-line;
+        }
+        
+        .event-content .speaker-label {
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+        
+        .event-content .speaker-name {
+            font-size: 12px;
+            font-weight: normal;
+            line-height: 1.2;
+            flex-grow: 1;
+        }
+        
+        .event-content small {
+            display: block;
+            margin-top: 1px;
+            color: #232F34;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 6;
+            -webkit-box-orient: vertical;
+        }
+        
+        .cat-c {
+            border-left-color: #bf9cff;
+        }
+        
+        .cat-e {
+            border-left-color: #e1ff7b;
+        }
+        
+        .cat-h {
+            border-left-color: #810e56;
+        }
+        
+        .cat-m {
+            border-left-color: #ff637e;
+        }
+        .cat-s {
+            border-left-color: #22523D;
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            /* Allow items to wrap */
+        }
+        
+        .day-filter {
+            display: flex;
+            gap: 10px;
+            margin-left: 5%;
+        }
+        
+        .day-btn.active {
+            background-color: #26a69a;
+        }
+        
+        .legend {
+            display: flex;
+            gap: 15px;
+            margin-right: 5%;
+        }
+        
+        
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+        }
+        
+        .legend-circle {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        
+        .cat-c-circle {
+            background-color: #bf9cff;
+        }
+        
+        .cat-e-circle {
+            background-color: #e1ff7b;
+        }
+        
+        .cat-h-circle {
+            background-color: #810e56;
+        }
+        
+        .cat-m-circle {
+            background-color: #ff637e;
+        }
+        .cat-s-circle {
+            background-color: #22523D;
+        }
+        
+        .current-date {
+            font-size: 1.2rem;
+            margin: 10px 0;
+            color: #26a69a;
+        }
+        
+        .empty-message {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .empty-message i {
+            font-size: 48px;
+            color: #9e9e9e;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    
+    <!-- Container for filter and legend -->
+    <div class="header-container">
+        <!-- Day Filter -->
+        <div class="day-filter">
+            <button class="btn day-btn" data-date="2025-08-20">Dia 20</button>
+            <button class="btn day-btn" data-date="2025-08-21">Dia 21</button>
+            <button class="btn day-btn" data-date="2025-08-22">Dia 22</button>
+        </div>
+
+        <!-- Legend -->
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-circle cat-c-circle"></div>
+                <span>Palestras Curriculares</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-circle cat-e-circle"></div>
+                <span>Palestras Extracurriculares</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-circle cat-h-circle"></div>
+                <span>HandsOn</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-circle cat-m-circle"></div>
+                <span>Mesas Redondas</span>
+            </div>
+        </div>
+    </div>
+    <table id="schedule" class="desktop-table">
+        <thead>
+            <tr>
+                <th>Horário</th>
+                <th>Carvalho I</th>
+                <th>Carvalho II</th>
+                <th>Carvalho III</th>
+                <th>Amoreira I</th>
+                <th>Amoreira II</th>
+                <th>Cerejeira</th>
+                <th>Ipê</th>
+                <th>Jacarandá</th>
+                <th>Manacá</th>
+                <th>Seringueira</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Eventos serão carregados aqui -->
+        </tbody>
+        
+    </table>
+    <div id="current-date" class="current-date"></div>
+    <script>
+        const API_KEY = "AIzaSyCIJojfSq6qcmE1aH2AHf4rn9E_YnMJcBY";
+        const CALENDAR_ID =
+            "c_2bbc8b27c54c1ebf84fced8de061650e527a7d206fa3b2aa34e143058639a1d8@group.calendar.google.com";
+        let todosEventos = [];
+
+        async function carregarEventos(date) {
+            try {
+                // Use timeZone parameter to ensure correct timezone handling
+                const url = `https://www.googleapis.com/calendar/v3/calendars/${CALENDAR_ID}/events?key=${API_KEY}&timeMin=${date}T00:00:00-03:00&timeMax=${date}T23:59:59-03:00&singleEvents=true&orderBy=startTime&timeZone=America/Sao_Paulo`;
+                console.log("Fetching events with URL:", url);
+
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log("API Response for date:", date, data); // Log the API response
+
+                if (data.error) {
+                    console.error("API returned an error:", data.error);
+                    return [];
+                }
+
+                // Log the number of events found
+                const events = data.items || [];
+                console.log(`Found ${events.length} events for date ${date}`);
+
+                // Debug: Log each event summary to help diagnose issues
+                events.forEach((event, index) => {
+                    const startTime = event.start && event.start.dateTime ? event.start.dateTime : 'No start time';
+                    const location = event.location || 'No location';
+                    console.log(`Event ${index + 1}:`, event.summary,
+                        "Start:", startTime,
+                        "Location:", location);
+                });
+
+                return events;
+            } catch (error) {
+                console.error("Error fetching events:", error);
+                return [];
+            }
+        }
+
+        function exibirEventos(eventos) {
+            console.log("Events to display:", eventos); // Log the events to be displayed
+            todosEventos = eventos;
+            exibirEventosDesktop(eventos);
+        }
+
+        // Adicione estas funções antes da função iniciar()
+        function detectMobile() {
+            return window.innerWidth <= 768;
+        }
+
+        function adjustTableForMobile() {
+            const isMobile = detectMobile();
+            const table = document.getElementById('schedule');
+            
+            if (isMobile) {
+                table.classList.add('mobile-view');
+            } else {
+                table.classList.remove('mobile-view');
+            }
+        }
+
+
+        // Então, modifique a função document.addEventListener("DOMContentLoaded", ...) para chamar adjustTableForMobile
+        document.addEventListener("DOMContentLoaded", () => {
+            // Adicione esta linha
+            adjustTableForMobile();
+            
+            // O código existente continua...
+            document.querySelector('.day-btn[data-date="2025-08-20"]').classList.add('active');
+            iniciar("2025-08-20");
+        });
+
+        // E adicione este event listener para ajustes em tempo real durante redimensionamentos
+        window.addEventListener('resize', adjustTableForMobile);
+
+        async function iniciar(date) {
+            try {
+                // Update the date display
+                document.getElementById('current-date').textContent = formatarData(date);
+
+                // Show loading indicator
+                document.querySelector("#schedule tbody").innerHTML =
+                    "<tr><td colspan='9'><div class='progress'><div class='indeterminate'></div></div><p>Carregando eventos...</p></td></tr>";
+
+                const eventos = await carregarEventos(date);
+                console.log("Total de eventos:", eventos ? eventos.length : 0);
+
+                if (!eventos || eventos.length === 0) {
+                    document.querySelector("#schedule tbody").innerHTML =
+                        "<tr><td colspan='9'><div class='empty-message'><i class='material-icons'>event_busy</i><p>Nenhum evento encontrado para esta data.</p><p>Tente selecionar outra data.</p></div></td></tr>";
+                    return;
+                }
+
+                exibirEventos(eventos);
+            } catch (error) {
+                console.error("Erro ao carregar eventos:", error);
+                document.querySelector("#schedule tbody").innerHTML =
+                    "<tr><td colspan='9'><div class='empty-message'><i class='material-icons'>error</i><p>Erro ao carregar eventos. Por favor, tente novamente mais tarde.</p><p>Detalhes: " + error.message + "</p></div></td></tr>";
+            }
+        }
+
+        
+
+        document.querySelectorAll('.day-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons
+                document.querySelectorAll('.day-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+
+                // Add active class to clicked button
+                button.classList.add('active');
+
+                const date = button.getAttribute('data-date');
+                console.log("Loading events for date:", date);
+                iniciar(date);
+            });
+        });
+
+        // Ajuste na função exibirEventosDesktop para horários de 15 em 15 minutos
+
+        function exibirEventosDesktop(eventos) {
+            const tbody = document.querySelector("#schedule tbody");
+            tbody.innerHTML = "";
+            // Horários de 15 em 15 minutos das 09:00 até 19:30
+            const horarios = [];
+            for (let h = 9; h <= 19; h++) {
+                for (let m = 0; m < 60; m += 15) {
+                    if (h === 19 && m > 30) break; // Limitar até 19:30
+                    horarios.push(h.toString().padStart(2, '0') + ":" + m.toString().padStart(2, '0'));
+                }
+            }
+
+            const salas = ["Sala Carvalho I", "Sala Carvalho II", "Sala Carvalho III", "Sala Amoreira I", "Sala Amoreira II", "Sala Cerejeira", "Sala Ipê", "Sala Jacarandá", "Sala Manacá", "Sala Seringueira"];
+            let ocupadas = {};
+            const horariosRelevantes = new Set();
+
+            eventos.forEach(evento => {
+                if (!evento.start || !evento.start.dateTime || !evento.location || !evento.end || !evento.end.dateTime) return;
+
+                const inicioEvento = new Date(evento.start.dateTime);
+                const fimEvento = new Date(evento.end.dateTime);
+                const horaInicioStr = inicioEvento.getHours().toString().padStart(2, '0') + ":" + inicioEvento.getMinutes().toString().padStart(2, '0');
+
+                const indexHorarioInicio = horarios.indexOf(horaInicioStr);
+                const indexSala = salas.indexOf(evento.location);
+
+                if (indexHorarioInicio === -1 || indexSala === -1) return;
+
+                const minutosOcupados = (fimEvento - inicioEvento) / (1000 * 60);
+                const slotsOcupados = Math.max(1, Math.ceil(minutosOcupados / 15));
+
+                for (let i = 0; i < slotsOcupados; i++) {
+                    const targetIndexHorario = indexHorarioInicio + i;
+                    if (targetIndexHorario < horarios.length) {
+                        horariosRelevantes.add(horarios[targetIndexHorario]);
+                        if (i > 0) {
+                            ocupadas[`${targetIndexHorario}-${indexSala}`] = true;
+                        }
+                    }
+                }
+            });
+
+            horarios.forEach((horario, indexHorario) => {
+                if (!horariosRelevantes.has(horario)) {
+                    return;
+                }
+
+                let row = document.createElement("tr");
+                let timeCell = document.createElement("td");
+                timeCell.textContent = horario;
+                row.appendChild(timeCell);
+
+                salas.forEach((sala, indexSala) => {
+                    const chaveOcupada = `${indexHorario}-${indexSala}`;
+                    if (ocupadas[chaveOcupada]) {
+                        return;
+                    }
+
+                    let cell = document.createElement("td");
+
+                    let eventosNaHoraESala = eventos.filter((e) => {
+                        if (!e.start || !e.start.dateTime || !e.location) return false;
+                        const inicioEvento = new Date(e.start.dateTime);
+                        const horaEvento = inicioEvento.getHours();
+                        const minutoEvento = inicioEvento.getMinutes();
+                        const [hora, minuto] = horario.split(":").map(Number);
+                        return horaEvento === hora && minutoEvento === minuto && e.location === sala;
+                    });
+
+                    if (eventosNaHoraESala.length > 0) {
+                        eventosNaHoraESala.sort((a, b) => new Date(a.start.dateTime) - new Date(b.start.dateTime));
+                        let evento = eventosNaHoraESala[0];
+
+                        let card = document.createElement("div");
+                        card.className = `mdc-card ${definirCategoria(evento.summary)}`;
+                        card.setAttribute("tabindex", "0");
+
+                        let ripple = document.createElement("div");
+                        ripple.className = "mdc-card__ripple";
+
+                        let eventContent = document.createElement("div");
+                        eventContent.className = "event-content";
+
+                        const speakerInfo = parseDescription(evento.description || "");
+
+                        let tituloFormatado = evento.summary.replace(/^(\S+)\s*-\s*(.+)$/, (match, p1, p2) => {
+                            return p1 + "\n" + p2;
+                        });
+
+                        eventContent.innerHTML = `
+                            <strong class="title">${tituloFormatado}</strong>
+                            <div class="time-room">${formatarHorario(evento.start.dateTime, evento.end.dateTime)}\n${evento.location}</div>
+                            <br>
+                            <div class="speaker-name">${evento.description ? evento.description.replace(/\n/g, '<br>') : "Sem descrição disponível"}</div>
+                        `;
+
+                        card.appendChild(ripple);
+                        card.appendChild(eventContent);
+
+                        // Criar tooltip
+                        let tooltip = document.createElement("div");
+                        tooltip.className = "tooltip";
+
+                        // Ajuste no innerHTML do tooltip para mostrar a descrição completa sem separar campos
+                        tooltip.innerHTML = `
+                            <div class="tooltip-header">
+                                <img src="${speakerInfo.foto || 'imagem.webp'}" alt="${speakerInfo.palestrante || evento.summary}" onerror="this.onerror=null;this.src='imagem.webp';">
+                            </div>
+                            <div class="tooltip-content">
+                                <div class="tooltip-title">${evento.summary}</div>
+                                <div class="tooltip-body">${evento.description || "Sem descrição disponível"}</div>
+                            </div>
+                        `;
+
+                        // Funções para mostrar e esconder tooltip
+                        function showTooltip(e) {
+                            if (!tooltip.parentNode) {
+                                document.body.appendChild(tooltip);
+                            }
+                            const rect = card.getBoundingClientRect();
+                            let left = e.clientX + 15;
+                            let top = e.clientY + 15;
+                            if (left + tooltip.offsetWidth > window.innerWidth - 10) {
+                                left = window.innerWidth - tooltip.offsetWidth - 10;
+                            }
+                            if (top + tooltip.offsetHeight > window.innerHeight - 10) {
+                                top = window.innerHeight - tooltip.offsetHeight - 10;
+                            }
+                            tooltip.style.left = `${left}px`;
+                            tooltip.style.top = `${top}px`;
+                            tooltip.classList.add('visible');
+                            e.preventDefault();
+                        }
+
+                        function hideTooltip() {
+                            tooltip.classList.remove('visible');
+                            setTimeout(() => {
+                                if (tooltip.parentNode) {
+                                    tooltip.parentNode.removeChild(tooltip);
+                                }
+                            }, 300);
+                        }
+
+                        card.addEventListener("mousemove", showTooltip);
+                        card.addEventListener("mouseleave", hideTooltip);
+                        card.addEventListener("click", showTooltip);
+                        card.addEventListener("dblclick", () => {
+                            M.toast({ html: `<strong>${evento.summary}</strong><br>${evento.description || "Sem descrição disponível"}`, displayLength: 4000 });
+                        });
+
+                        cell.appendChild(card);
+
+                        const inicioEvento = new Date(evento.start.dateTime);
+                        const fimEvento = new Date(evento.end.dateTime);
+                        const minutosOcupados = (fimEvento - inicioEvento) / (1000 * 60);
+                        const slotsOcupados = Math.max(1, Math.ceil(minutosOcupados / 15)); // 15 min slots
+                        cell.rowSpan = slotsOcupados;
+                    }
+
+                    row.appendChild(cell);
+                });
+
+                tbody.appendChild(row);
+            });
+        }
+        
+        // Helper function to parse description and extract structured data
+        // Ajuste na função parseDescription para extrair apenas o texto do palestrante até a próxima linha ou campo
+        function parseDescription(description) {
+            const result = {
+                palestrante: '',
+                foto: 'imagem.webp', // Imagem padrão
+                tema: '',
+                resumo: '',
+                cv: []
+            };
+
+            if (!description) return result;
+
+            // Extrair texto puro (remover tags HTML)
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = description;
+            const text = tempDiv.textContent || tempDiv.innerText || '';
+
+            // Extrair imagem (URL de imagem em href ou texto)
+            const imgRegex = /(https?:\/\/[^\s]+?\.(jpg|jpeg|png|gif|webp))/gi;
+            const imgMatches = description.match(imgRegex);
+            if (imgMatches && imgMatches.length > 0) {
+                result.foto = imgMatches[0];
+            }
+
+           // Extrair palestrante: pega só até a próxima quebra de linha, campo ou a palavra "tema"
+            const palestranteMatch = text.match(/Palestrante:\s*([\s\S]*?)(?=\nTema:|\nTema|$)/i);
+            if (palestranteMatch) {
+                result.palestrante = palestranteMatch[1].trim();
+            }
+
+            // Extrair tema: pega só até a próxima quebra de linha ou campo
+            const temaMatch = text.match(/tema:\s*([^\n\r]+)/i);
+            if (temaMatch) {
+                result.tema = temaMatch[1].trim();
+            }
+
+            // Extrair resumo (pode ser multiline)
+            const resumoMatch = text.match(/resumo( do tema)?:\s*([\s\S]+)/i);
+            if (resumoMatch) {
+                let resumoText = resumoMatch[2].trim();
+                const cvIndex = resumoText.search(/cv resumido?:/i);
+                if (cvIndex !== -1) {
+                    resumoText = resumoText.substring(0, cvIndex).trim();
+                }
+                result.resumo = resumoText;
+            }
+
+            // Extrair CV resumido em lista
+            const cvMatch = text.match(/cv resumido?:\s*([\s\S]+)/i);
+            if (cvMatch) {
+                const cvText = cvMatch[1];
+                const lines = cvText.split('\n');
+                lines.forEach(line => {
+                    const trimmed = line.trim();
+                    if (trimmed.startsWith('-') || trimmed.startsWith('•')) {
+                        result.cv.push(trimmed.substring(1).trim());
+                    }
+                });
+            }
+
+            return result;
+        }
+
+        function definirCategoria(titulo) {
+            if (!titulo) return "";
+            if (titulo.startsWith("C")) return "cat-c";
+            if (titulo.startsWith("E")) return "cat-e";
+            if (titulo.startsWith("H")) return "cat-h";
+            if (titulo.startsWith("M")) return "cat-m";
+            if (titulo.startsWith("S")) return "cat-s";
+            return "";
+        }
+
+        function formatarHorario(inicio, fim) {
+            return `${new Date(inicio).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} - ${new Date(fim).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+        }
+
+        // Format date for display (e.g., "20 de Agosto de 2025")
+        function formatarData(dateStr) {
+            const date = new Date(dateStr + "T12:00:00");
+            return date.toLocaleDateString('pt-BR', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            // Set active class on the first button (day 20)
+            document.querySelector('.day-btn[data-date="2025-08-20"]').classList.add('active');
+            iniciar("2025-08-20");
+        });
+    </script>
+</body>
+
+</html>
