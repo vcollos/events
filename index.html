@@ -767,6 +767,7 @@
             }
 
             const salas = ["Sala Carvalho I", "Sala Carvalho II", "Sala Carvalho III", "Sala Amoreira I", "Sala Amoreira II", "Sala Cerejeira", "Sala Ipê", "Sala Jacarandá", "Sala Manacá", "Sala Seringueira"];
+            const salasNormalizadas = salas.map(normalizarTexto);
             let ocupadas = {};
             const horariosRelevantes = new Set();
 
@@ -778,7 +779,7 @@
                 const horaInicioStr = inicioEvento.getHours().toString().padStart(2, '0') + ":" + inicioEvento.getMinutes().toString().padStart(2, '0');
 
                 const indexHorarioInicio = horarios.indexOf(horaInicioStr);
-                const indexSala = salas.indexOf(evento.location);
+                const indexSala = salasNormalizadas.indexOf(normalizarTexto(evento.location));
 
                 if (indexHorarioInicio === -1 || indexSala === -1) return;
 
@@ -814,13 +815,14 @@
 
                     let cell = document.createElement("td");
 
+                    const salaAtualNorm = salasNormalizadas[indexSala];
                     let eventosNaHoraESala = eventos.filter((e) => {
                         if (!e.start || !e.start.dateTime || !e.location) return false;
                         const inicioEvento = new Date(e.start.dateTime);
                         const horaEvento = inicioEvento.getHours();
                         const minutoEvento = inicioEvento.getMinutes();
                         const [hora, minuto] = horario.split(":").map(Number);
-                        return horaEvento === hora && minutoEvento === minuto && e.location === sala;
+                        return horaEvento === hora && minutoEvento === minuto && normalizarTexto(e.location) === salaAtualNorm;
                     });
 
                     if (eventosNaHoraESala.length > 0) {
@@ -982,6 +984,10 @@
             }
 
             return result;
+        }
+
+        function normalizarTexto(str) {
+            return (str || '').trim().toLowerCase();
         }
 
         function definirCategoria(titulo) {
