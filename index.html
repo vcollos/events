@@ -770,21 +770,21 @@
             const salasNormalizadas = salas.map(normalizarTexto);
             let ocupadas = {};
             const horariosRelevantes = new Set();
+            const baseMinutes = 9 * 60; // 09:00 em minutos
 
             eventos.forEach(evento => {
                 if (!evento.start || !evento.start.dateTime || !evento.location || !evento.end || !evento.end.dateTime) return;
 
                 const inicioEvento = new Date(evento.start.dateTime);
                 const fimEvento = new Date(evento.end.dateTime);
-                const horaInicioStr = inicioEvento.getHours().toString().padStart(2, '0') + ":" + inicioEvento.getMinutes().toString().padStart(2, '0');
 
-                const indexHorarioInicio = horarios.indexOf(horaInicioStr);
+                const indexHorarioInicio = Math.floor(((inicioEvento.getHours()*60 + inicioEvento.getMinutes()) - baseMinutes) / 15);
+                const indexHorarioFim = Math.ceil(((fimEvento.getHours()*60 + fimEvento.getMinutes()) - baseMinutes) / 15);
                 const indexSala = salasNormalizadas.indexOf(normalizarTexto(evento.location));
 
-                if (indexHorarioInicio === -1 || indexSala === -1) return;
+                if (indexHorarioInicio < 0 || indexSala === -1) return;
 
-                const minutosOcupados = (fimEvento - inicioEvento) / (1000 * 60);
-                const slotsOcupados = Math.max(1, Math.ceil(minutosOcupados / 15));
+                const slotsOcupados = Math.max(1, indexHorarioFim - indexHorarioInicio);
 
                 for (let i = 0; i < slotsOcupados; i++) {
                     const targetIndexHorario = indexHorarioInicio + i;
@@ -819,10 +819,8 @@
                     let eventosNaHoraESala = eventos.filter((e) => {
                         if (!e.start || !e.start.dateTime || !e.location) return false;
                         const inicioEvento = new Date(e.start.dateTime);
-                        const horaEvento = inicioEvento.getHours();
-                        const minutoEvento = inicioEvento.getMinutes();
-                        const [hora, minuto] = horario.split(":").map(Number);
-                        return horaEvento === hora && minutoEvento === minuto && normalizarTexto(e.location) === salaAtualNorm;
+                        const indiceEvento = Math.floor(((inicioEvento.getHours()*60 + inicioEvento.getMinutes()) - baseMinutes) / 15);
+                        return indiceEvento === indexHorario && normalizarTexto(e.location) === salaAtualNorm;
                     });
 
                     if (eventosNaHoraESala.length > 0) {
@@ -910,8 +908,9 @@
 
                         const inicioEvento = new Date(evento.start.dateTime);
                         const fimEvento = new Date(evento.end.dateTime);
-                        const minutosOcupados = (fimEvento - inicioEvento) / (1000 * 60);
-                        const slotsOcupados = Math.max(1, Math.ceil(minutosOcupados / 15)); // 15 min slots
+                        const indexInicio = Math.floor(((inicioEvento.getHours()*60 + inicioEvento.getMinutes()) - baseMinutes) / 15);
+                        const indexFim = Math.ceil(((fimEvento.getHours()*60 + fimEvento.getMinutes()) - baseMinutes) / 15);
+                        const slotsOcupados = Math.max(1, indexFim - indexInicio);
                         cell.rowSpan = slotsOcupados;
                     }
 
